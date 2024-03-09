@@ -5,8 +5,12 @@
                 <v-card-title>Hi {{ fullName || email }}!</v-card-title>
                 <v-card-subtitle>Welcome to the HDAP demo</v-card-subtitle>
                 <v-list>
-                    <v-list-item prepend-icon="mdi-account-outline">My profile</v-list-item>
-                    <v-list-item prepend-icon="mdi-cog-outline">Settings</v-list-item>
+                    <v-list-item prepend-icon="mdi-account-outline" link href="/me" @click="display = false" class="text-decoration-none">
+                        My profile
+                    </v-list-item>
+                    <v-list-item prepend-icon="mdi-cog-outline" link href="/settings" @click="display = false">
+                        Settings
+                    </v-list-item>
                 </v-list>
                 <v-card-actions>
                     <v-spacer></v-spacer>

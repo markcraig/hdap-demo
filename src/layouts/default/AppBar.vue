@@ -5,7 +5,7 @@
     </template>
 
     <v-app-bar-title>
-      HDAP demo
+      <v-btn text="HDAP demo" link href="/"></v-btn>
     </v-app-bar-title>
 
     <template v-slot:append>
