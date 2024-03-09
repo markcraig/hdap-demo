@@ -9,7 +9,9 @@
     </v-app-bar-title>
 
     <template v-slot:append>
-      <v-btn text="Search" icon="mdi-magnify"></v-btn>
+      <v-btn text="Search" icon link href="/search">
+        <v-icon>mdi-magnify</v-icon>
+      </v-btn>
       <v-btn text="My account" icon>
         <v-icon>mdi-account-outline</v-icon>
         <DefaultLogin />
