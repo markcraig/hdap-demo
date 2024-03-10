@@ -20,13 +20,15 @@ async function findEntry(email, password) {
       scope: 'sub'
     }
   })
-  entry.cn = res.data.result[0].cn[0] || email
-  entry.dn = res.data.result[0]._id
+  if (typeof res.data.result !== 'undefined' && res.data.result.length > 0) {
+    entry.cn = res.data.result[0].cn[0] || email
+    entry.dn = res.data.result[0]._id
+  }
   return entry
 }
 
 async function authenticate(entry) {
-  if (!entry) return
+  if (!entry || !entry.dn) return
   const res = await axios.post(`/hdap/${entry.dn}?_action=authenticate`, {
     password: `${entry.password}`
   }, {
@@ -42,19 +44,21 @@ export const useAppStore = defineStore('app', () => {
   const jwt = ref('')
 
   function addAuthzHeader(request) {
-    return (authenticated.value)
-      ? request.headers.set('Authorization', `Bearer ${jwt.value}`)
-      : request
+    if (!authenticated.value) return request
+    request.headers['Authorization'] = `Bearer ${jwt.value}`
+    return request
   }
 
   async function login(email, password) {
     try {
       const entry = await findEntry(email, password)
       const token = await authenticate(entry)
-      authenticated.value = true
-      dn.value = entry.dn
-      fullName.value = entry.cn
-      jwt.value = token
+      if (token) {
+        authenticated.value = true
+        dn.value = entry.dn
+        fullName.value = entry.cn
+        jwt.value = token
+      }
     } catch (error) {
       console.error(error)
     }
