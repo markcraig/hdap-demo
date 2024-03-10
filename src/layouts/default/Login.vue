@@ -1,8 +1,8 @@
 <template>
     <v-menu v-model="display" location="end" activator="parent" :close-on-content-click="false">
-        <template v-if="authenticated">
+        <template v-if="store.authenticated">
             <v-card class="mx-auto pa-12 pb-8" rounded="lg" elevation="8" min-width="500px">
-                <v-card-title>Hi {{ fullName || email }}!</v-card-title>
+                <v-card-title>Hi {{ store.fullName || email }}!</v-card-title>
                 <v-card-subtitle>Welcome to the HDAP demo</v-card-subtitle>
                 <v-list>
                     <v-list-item prepend-icon="mdi-account-outline" link href="/me" @click="display = false" class="text-decoration-none">
@@ -40,26 +40,25 @@
 </template>
 
 <script setup>
-//import { useAuthStateStore } from '@/stores/state'
+import { useAppStore } from '@/store/app'
 import { ref } from 'vue'
 
-//const authState = useAuthStateStore()
-let authenticated = ref('')
+const store = useAppStore()
+
 let display = ref(false)
-const showPwd = ref(false)
-const email = ref('bjensen@example.com')
-const password = ref('hifalutin')
+const email = ref('')
+const password = ref('')
 const emailRules = ref([value => { return (value) ? true : 'You must enter an email.' }])
 const passwordRules = ref([value => { return (value) ? true : 'You must enter a password.' }])
-const fullName = ref('Babs Jensen')
+const showPwd = ref(false)
 
-function login() {
-    //authState.login(email.value, password.value)
-    authenticated = true
+async function login() {
+    await store.login(email.value, password.value)
 }
 
 function logout() {
-    //authState.logout()
-    authenticated = false
+    email.value = ''
+    password.value =''
+    store.logout()
 }
 </script>
