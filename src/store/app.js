@@ -20,7 +20,6 @@ async function findEntry(email, password) {
       scope: 'sub'
     }
   })
-  console.log(res)
   entry.cn = res.data.result[0].cn[0] || email
   entry.dn = res.data.result[0]._id
   return entry

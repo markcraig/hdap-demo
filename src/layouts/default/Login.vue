@@ -44,10 +44,9 @@ import { useAppStore } from '@/store/app'
 import { ref } from 'vue'
 
 const store = useAppStore()
-
 let display = ref(false)
-const email = ref('')
-const password = ref('')
+const email = ref('bjensen@example.com')
+const password = ref('hifalutin')
 const emailRules = ref([value => { return (value) ? true : 'You must enter an email.' }])
 const passwordRules = ref([value => { return (value) ? true : 'You must enter a password.' }])
 const showPwd = ref(false)
@@ -57,8 +56,6 @@ async function login() {
 }
 
 function logout() {
-    email.value = ''
-    password.value =''
     store.logout()
 }
 </script>
