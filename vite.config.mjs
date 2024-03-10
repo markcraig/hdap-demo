@@ -62,6 +62,12 @@ export default defineConfig({
     ],
   },
   server: {
+    proxy: {
+      '/hdap': {
+        target: 'https://localhost:8443', // DS with HTTPS
+        secure: false                     // Don't validate certs
+      }
+    },
     port: 3000,
   },
 })
