@@ -4,7 +4,7 @@
             <v-text-field placeholder="Search" clearable v-model.trim="terms" @keyup.enter="search()"></v-text-field>
             <v-data-table v-if="results" :items="entries">
                 <template #item.link="{ item }">
-                    <router-link :to="{ path: `/hdap/${item.link}` }">
+                    <router-link :to="{ path: `/entry/${item.link}` }">
                         {{ decodeURIComponent(item.link.split('/').pop()) }}
                     </router-link>
                 </template>
@@ -22,14 +22,14 @@
                 </template>
                 <template #item.manager="{ item }">
                     <p v-for="(one, index) in item.manager">
-                        <router-link :to="{ path: `/hdap/${one}` }">
+                        <router-link :to="{ path: `/entry/${one}` }">
                             {{ decodeURIComponent(one.split('/').pop()) }}
                         </router-link><span v-if="index != (item.manager.length - 1)">,</span>
                     </p>
                 </template>
                 <template #item.members="{ item }">
                     <p v-for="(member, index) in item.members">
-                        <router-link :to="{ path: `/hdap/${member}` }">
+                        <router-link :to="{ path: `/entry/${member}` }">
                             {{ decodeURIComponent(member.split('/').pop()) }}
                         </router-link><span v-if="index != (item.members.length - 1)">,</span>
                     </p>
