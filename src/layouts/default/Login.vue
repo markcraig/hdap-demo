@@ -5,7 +5,7 @@
                 <v-card-title>Hi {{ store.fullName || email }}!</v-card-title>
                 <v-card-subtitle>Welcome to the HDAP demo</v-card-subtitle>
                 <v-list>
-                    <v-list-item prepend-icon="mdi-account-outline" link :href="`/entry/${store.dn}`" @click="display = false" class="text-decoration-none">
+                    <v-list-item prepend-icon="mdi-account-outline" link :href="`/view/${store.dn}`" @click="display = false" class="text-decoration-none">
                         My profile
                     </v-list-item>
                     <v-list-item prepend-icon="mdi-cog-outline" link href="/settings" @click="display = false">

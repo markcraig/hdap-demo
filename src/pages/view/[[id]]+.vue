@@ -18,7 +18,7 @@ const entry = ref('')
 const attributes = ref([])
 
 function read() {
-    const path = window.location.pathname.replace('/entry', '/hdap')
+    const path = window.location.pathname.replace('/view', '/hdap')
     const config = store.addAuthzHeader({ headers: { 'Content-Type': 'application/json' } })
     // Get operational attributes if this is the Root DSE.
     if (/^\/hdap\/?$/.test(path)) {
