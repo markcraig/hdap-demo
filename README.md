@@ -10,7 +10,7 @@ unzip -q ~/.m2/repository/org/forgerock/opendj/opendj-server/7.5.0-SNAPSHOT/open
 
 export DEPLOYMENT_ID=ADaMkVIXfryp4tZN3_0V4WoB3BZc9SQ5CBVN1bkVDE6OSY5Kl7pIibg
 
-./opendj/setup \                                                                                    
+./opendj/setup \
  --serverId evaluation-only \
  --deploymentId $DEPLOYMENT_ID \
  --deploymentIdPassword password \
@@ -21,8 +21,8 @@ export DEPLOYMENT_ID=ADaMkVIXfryp4tZN3_0V4WoB3BZc9SQ5CBVN1bkVDE6OSY5Kl7pIibg
  --adminConnectorPort 4444 \
  --ldapPort 1389 \
  --enableStartTls \
- --ldapsPort 1636 \     
- --httpsPort 8443 \                          
+ --ldapsPort 1636 \
+ --httpsPort 8443 \
  --replicationPort 8989 \
  --bootstrapReplicationServer localhost:8989 \
  --profile ds-evaluation \
