@@ -37,6 +37,30 @@ async function authenticate(entry) {
   return res.data.access_token
 }
 
+async function authenticateWithId(id, password) {
+  if (!id || !password) return
+  const res = await axios.post(`/hdap/${id}?_action=authenticate`, {
+    password: `${password}`
+  }, {
+    headers: { 'Content-Type': 'application/json' }
+  })
+  return res.data.access_token
+}
+
+async function getCn(id, token) {
+  if (!id) return 
+  const res = await axios.get(`/hdap/${id}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    params: {
+      _fields: 'cn'
+    }
+  })
+  return (res.data.cn) ? res.data.cn[0] : ''
+}
+
 export const useAppStore = defineStore('app', () => {
   const authenticated = ref(false)
   const dn = ref('')
@@ -64,6 +88,21 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
+  async function loginWithId(id, password) {
+    try {
+      const token = await authenticateWithId(id, password)
+      if (token) {
+        let cn = await getCn(id, token)
+        authenticated.value = true
+        dn.value = id
+        fullName.value = cn || id
+        jwt.value = token
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   function logout() {
     authenticated.value = false
     dn.value = ''
@@ -78,6 +117,7 @@ export const useAppStore = defineStore('app', () => {
     jwt,
     addAuthzHeader,
     login,
+    loginWithId,
     logout
   }
 })
