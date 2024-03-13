@@ -48,7 +48,7 @@ const store = useAppStore()
 const terms = ref('')
 const results = ref('')
 const entries = computed(() => {
-    if (!results) return []
+    if (!results.value) return []
     let formatted = []
     results.value.forEach(result => {
         formatted.push({
@@ -76,6 +76,6 @@ function search() {
     })
     axios.get('/hdap', config)
         .then((res) => { results.value = (res.data.result) ? res.data.result : [] })
-        .catch((error) => { console.log(error) }) // FixMe: handle token expiry
+        .catch((error) => { store.handleAuthError(error) })
 }
 </script>

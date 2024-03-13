@@ -32,7 +32,7 @@ function read() {
                 attributes.value.push({ 'attribute': key, 'value': formatValueAsString(value) })
             }
         })
-        .catch((error) => { console.log(error) }) // FixMe: handle token expiry
+        .catch((error) => { store.handleAuthError(error) })
 }
 
 function formatValueAsString(value) {
