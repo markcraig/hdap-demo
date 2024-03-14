@@ -5,18 +5,20 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint . --fix --ignore-path .gitignore"
+    "lint": "eslint . --fix --ignore-path .gitignore",
+    "test": "vitest"
   },
   "dependencies": {
     "@mdi/font": "7.0.96",
-    "axios": "^1.6.7",
     "core-js": "^3.34.0",
+    "jwt-decode": "^4.0.0",
     "pinia-plugin-persistedstate": "^3.2.1",
     "roboto-fontface": "*",
     "vue": "^3.3.0",
     "vuetify": "^3.0.0"
   },
   "devDependencies": {
+    "@testing-library/vue": "^8.0.3",
     "@vitejs/plugin-vue": "^4.5.0",
     "eslint": "^8.56.0",
     "eslint-config-standard": "^17.1.0",
@@ -25,6 +27,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-vue": "^9.19.0",
+    "happy-dom": "^14.0.0",
     "pinia": "^2.1.0",
     "sass": "^1.69.0",
     "unplugin-auto-import": "^0.17.3",
@@ -34,6 +37,7 @@
     "vite": "^5.0.0",
     "vite-plugin-vue-layouts": "^0.10.0",
     "vite-plugin-vuetify": "^2.0.0",
+    "vitest": "^1.4.0",
     "vue-router": "^4.2.0"
   }
 }

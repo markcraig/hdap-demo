@@ -40,11 +40,12 @@
 </template>
 
 <script setup>
-import axios from 'axios'
-import { useAppStore } from '@/store/app'
 import { computed, ref } from 'vue'
+import { useHdap } from '@/helpers/hdap'
+import { useHdapStore } from '@/store/hdap'
 
-const store = useAppStore()
+const hdap = useHdap()
+const hdapStore = useHdapStore()
 const terms = ref('')
 const results = ref('')
 const entries = computed(() => {
@@ -62,20 +63,14 @@ const entries = computed(() => {
     return formatted
 })
 
-function search() {
-    if (!terms.value) results.value = []
-    let config = store.addAuthzHeader({
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        params: {
-            _queryFilter: `cn co '${terms.value}' or uid eq '${terms.value}' or mail co '${terms.value}'`,
-            _fields: 'cn,mail,manager,uid,uniqueMember',
-            scope: 'sub'
-        }
-    })
-    axios.get('/hdap', config)
-        .then((res) => { results.value = (res.data.result) ? res.data.result : [] })
-        .catch((error) => { store.handleAuthError(error) })
+async function search() {
+    if (!terms.value) {
+        results.value = ''
+        return
+    }
+    const filter = `cn co '${terms.value}' or uid eq '${terms.value}' or mail co '${terms.value}'`
+    const params = { _fields: 'cn,mail,manager,uid,uniqueMember', scope: 'sub' }
+    const json = await hdap.query('', filter, params, hdapStore.getCredentials())
+    results.value = (json.result) ? json.result : []
 }
 </script>
