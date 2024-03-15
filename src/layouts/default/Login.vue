@@ -5,7 +5,8 @@
                 <v-card-title>Hi {{ store.fullName || email }}!</v-card-title>
                 <v-card-subtitle>Welcome to the HDAP demo</v-card-subtitle>
                 <v-list>
-                    <v-list-item prepend-icon="mdi-account-outline" link :href="`/view/${store.dn}`" @click="display = false" class="text-decoration-none">
+                    <v-list-item prepend-icon="mdi-account-outline" link :href="`/view/${store.dn}`"
+                        @click="display = false" class="text-decoration-none">
                         My profile
                     </v-list-item>
                     <v-list-item prepend-icon="mdi-cog-outline" link href="/settings" @click="display = false">
@@ -20,20 +21,43 @@
             </v-card>
         </template>
         <template v-else>
-            <v-card class="mx-auto pa-12 pb-8" title="Login" text="Enter your email and password to authenticate:"
+            <v-card class="mx-auto pa-12 pb-8" title="Login" text="Enter your credentials to authenticate:"
                 rounded="lg" elevation="8" min-width="500px">
-                <v-form fast-fail @submit.prevent="login">
-                    <v-text-field prepend-inner-icon="mdi-email" v-model="email" :rules="emailRules"
-                        label="E-mail"></v-text-field>
-                    <v-text-field v-model="password" prepend-inner-icon="mdi-lock"
-                        :append-icon="showPwd ? 'mdi-eye' : 'mdi-eye-off'" :type="showPwd ? 'text' : 'password'"
-                        :rules="passwordRules" counter label="Password"
-                        @click:append="showPwd = !showPwd"></v-text-field>
-                    <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn variant="text" @click="display = false"> Cancel </v-btn>
-                        <v-btn class="mt-2" @click="display = false" text="Login" type="submit" block></v-btn>
-                    </v-card-actions> </v-form>
+                <v-tabs v-model="tab">
+                    <v-tab value="first">Email</v-tab>
+                    <v-tab value="second">ID</v-tab>
+                </v-tabs>
+                <v-window v-model="tab">
+                    <v-window-item value="first">
+                        <v-form fast-fail @submit.prevent="login">
+                            <v-text-field prepend-inner-icon="mdi-email" v-model="email" :rules="emailRules"
+                                label="E-mail"></v-text-field>
+                            <v-text-field v-model="password" prepend-inner-icon="mdi-lock"
+                                :append-icon="showPwd ? 'mdi-eye' : 'mdi-eye-off'" :type="showPwd ? 'text' : 'password'"
+                                :rules="passwordRules" counter label="Password"
+                                @click:append="showPwd = !showPwd"></v-text-field>
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn variant="text" @click="display = false"> Cancel </v-btn>
+                                <v-btn class="mt-2" @click="display = false" text="Login" type="submit" block></v-btn>
+                            </v-card-actions>
+                        </v-form>
+                    </v-window-item>
+                    <v-window-item value="second">
+                        <v-form fast-fail @submit.prevent="loginWithId">
+                            <v-text-field prepend-inner-icon="mdi-identifier" v-model="id" label="Resource identifier"></v-text-field>
+                            <v-text-field v-model="password" prepend-inner-icon="mdi-lock"
+                                :append-icon="showPwd ? 'mdi-eye' : 'mdi-eye-off'" :type="showPwd ? 'text' : 'password'"
+                                :rules="passwordRules" counter label="Password"
+                                @click:append="showPwd = !showPwd"></v-text-field>
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn variant="text" @click="display = false"> Cancel </v-btn>
+                                <v-btn class="mt-2" @click="display = false" text="Login" type="submit" block></v-btn>
+                            </v-card-actions>
+                        </v-form>
+                    </v-window-item>
+                </v-window>
             </v-card>
         </template>
     </v-menu>
@@ -45,7 +69,9 @@ import { ref } from 'vue'
 
 const store = useAppStore()
 let display = ref(false)
+const tab = ref('first')
 const email = ref('bjensen@example.com')
+const id = ref('dc=com/dc=example/ou=People/uid=bjensen')
 const password = ref('hifalutin')
 const emailRules = ref([value => { return (value) ? true : 'You must enter an email.' }])
 const passwordRules = ref([value => { return (value) ? true : 'You must enter a password.' }])
@@ -53,6 +79,10 @@ const showPwd = ref(false)
 
 async function login() {
     await store.login(email.value, password.value)
+}
+
+async function loginWithId() {
+    await store.loginWithId(id.value, password.value)
 }
 
 function logout() {
