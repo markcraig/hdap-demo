@@ -1,11 +1,11 @@
 <template>
   <v-main>
-    <v-alert v-if="store.message" title="Info" type="info" closable>{{ store.message }}</v-alert>
+    <v-alert v-if="hdapStore.message" title="Info" type="info" closable>{{ hdapStore.message }}</v-alert>
     <router-view />
   </v-main>
 </template>
 
 <script setup>
-import { useAppStore } from '@/store/app'
-const store = useAppStore()
+import { useHdapStore } from '@/store/hdap'
+const hdapStore = useHdapStore()
 </script>

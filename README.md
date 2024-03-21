@@ -5,10 +5,10 @@ In the default password policy, turn off the requirement to authenticate over a 
 
 For example:
 
-```sh
-unzip -q ~/.m2/repository/org/forgerock/opendj/opendj-server/7.5.0-SNAPSHOT/opendj-server-7.5.0-SNAPSHOT.zip
+```
+unzip -q ~/.m2/repository/org/forgerock/opendj/opendj-server/7.6.0-SNAPSHOT/opendj-server-7.6.0-SNAPSHOT.zip
 
-export DEPLOYMENT_ID=ADaMkVIXfryp4tZN3_0V4WoB3BZc9SQ5CBVN1bkVDE6OSY5Kl7pIibg
+export DEPLOYMENT_ID=ASIQ8nH5BypHIB7AmmmJZ5VfCVKZXg5CBVN1bkVDAIT3myJF1rRsipI
 
 ./opendj/setup \
  --serverId evaluation-only \
@@ -44,6 +44,18 @@ In the DS evaluation profile:
 * Babs Jensen's mail is `bjensen@example.com` and password is `hifalutin`.
 * Kirsten Vaughan (admin) has mail `kvaughan@example.com` and password `bribery`.
 * Generated users are like `user.0@example.com` and their passwords are all `password`.
+
+# Run tests
+
+1. Make sure DS is running.
+2. Run the demo app:
+   ```
+   npm run dev
+   ```
+3. Run the tests:
+   ```
+   npm run test
+   ```
 
 ---
 
