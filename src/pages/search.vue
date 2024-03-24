@@ -2,7 +2,18 @@
     <v-container>
         <v-responsive class="align-center fill-height">
             <v-text-field placeholder="Search" clearable v-model.trim="terms" @keyup.enter="search()"></v-text-field>
-            <v-data-table v-if="results" :items="entries">
+            <v-btn v-if="selected && selected.length" prepend-icon="mdi-pencil" @click="bulkEdit()">
+                Bulk edit
+            </v-btn>
+            <v-btn v-if="selected && selected.length" prepend-icon="mdi-delete" @click="bulkDelete()">
+                Bulk delete
+            </v-btn>
+            <v-data-table v-if="results" :items="entries" item-value="link" show-select v-model="selected"
+                select-strategy="page">
+                <template #item.action="{ item }" sortable="false">
+                    <v-icon size="small" @click="editItem(item)">mdi-pencil</v-icon>
+                    <v-icon size="small" @click="deleteItem(item)">mdi-delete</v-icon>
+                </template>
                 <template #item.link="{ item }">
                     <router-link :to="{ path: `/view/${item.link}` }">
                         {{ decodeURIComponent(item.link.split('/').pop()) }}
@@ -40,7 +51,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, defineModel, ref } from 'vue'
 import { useHdap } from '@/helpers/hdap'
 import { useHdapStore } from '@/store/hdap'
 
@@ -53,6 +64,7 @@ const entries = computed(() => {
     let formatted = []
     results.value.forEach(result => {
         formatted.push({
+            action: '',
             link: result._id,
             name: result.cn,
             mail: result.mail,
@@ -62,6 +74,7 @@ const entries = computed(() => {
     })
     return formatted
 })
+const selected = defineModel()
 
 async function search() {
     if (!terms.value) {
@@ -72,5 +85,30 @@ async function search() {
     const params = { _fields: 'cn,mail,manager,uid,uniqueMember', scope: 'sub' }
     const json = await hdap.query('', filter, params, hdapStore.getCredentials())
     results.value = (json.result) ? json.result : []
+}
+
+async function deleteItem(item) {
+    await hdap
+        .remove(item.link, null, null, hdapStore.getCredentials())
+        .catch(error => { hdapStore.setMessage(error.message) })
+    search()
+}
+
+async function bulkDelete() {
+    await selected.value.forEach(async (id) => {
+        await hdap
+            .remove(id, null, null, hdapStore.getCredentials())
+            .catch(error => { hdapStore.setMessage(error.message) })
+        selected.value.remove(id)
+    })
+    search()
+}
+
+function editItem(item) {
+    alert('Not implemented yet')
+}
+
+function bulkEdit() {
+    alert('Not implemented yet')
 }
 </script>

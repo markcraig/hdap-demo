@@ -18,6 +18,7 @@ export const useHdapStore = defineStore('hdapStore', () => {
             if (currentJwt.value && isJwtExpired()) {
                 expireSession()
             }
+            message.value = ''
         })
     }
 
