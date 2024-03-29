@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia'
-import { getCurrentInstance, ref } from 'vue'
+import { getCurrentInstance, onMounted, ref } from 'vue'
 import { jwtDecode } from 'jwt-decode'
 import { useHdap } from '@/helpers/hdap'
-import { useRouter } from 'vue-router'
 
 // FixMe: this store needs automated testing
 export const useHdapStore = defineStore('hdapStore', () => {
@@ -10,8 +9,8 @@ export const useHdapStore = defineStore('hdapStore', () => {
      * Internal fields and functions
      *******************************/
 
-    const hdap = useHdap()
-    const router = useRouter()
+    let hdap = useHdap()
+    let skipForTests = false
 
     if (getCurrentInstance()) {
         onMounted(() => {
@@ -26,7 +25,6 @@ export const useHdapStore = defineStore('hdapStore', () => {
         currentJwt.value = ''
         friendlyUserName.value = ''
         message.value = (showMessage) ? 'Session expired' : ''
-        router.push('/')
     }
 
     function isJwtExpired() {
@@ -98,10 +96,11 @@ export const useHdapStore = defineStore('hdapStore', () => {
     }
 
     /**
-     * Resets the authentication state; user is anonymous.
+     * Resets the authentication state and returns to the home page; user is anonymous.
      */
     function logout() {
         expireSession()
+        if (!skipForTests) this.router.push('/')
     }
 
     /**
@@ -110,6 +109,14 @@ export const useHdapStore = defineStore('hdapStore', () => {
      */
     function setMessage(messageStr) {
         message.value = messageStr
+    }
+
+    /**
+     * Enables settings to run this store in test mode.
+     */
+    function setTestMode() {
+        hdap = useHdap('http://localhost:3000/hdap')
+        skipForTests = true
     }
 
     /**
@@ -129,6 +136,7 @@ export const useHdapStore = defineStore('hdapStore', () => {
         login,
         logout,
         setMessage,
+        setTestMode,
         whoAmI
     }
 })
