@@ -40,7 +40,7 @@
                     <v-list-item prepend-icon="mdi-checkbox-blank-outline" title="NameFinder"></v-list-item>
                     <v-list-item prepend-icon="mdi-checkbox-blank-outline"
                         title="Account mgmt (lock, unlock, etc.)"></v-list-item>
-                    <v-list-item prepend-icon="mdi-checkbox-blank-outline" title="Advanced search"></v-list-item>
+                    <v-list-item prepend-icon="mdi-checkbox-marked-outline" title="Advanced search"></v-list-item>
                     <v-list-item prepend-icon="mdi-checkbox-blank-outline" title="Password policy mgmt"></v-list-item>
                 </v-list>
             </v-sheet>
