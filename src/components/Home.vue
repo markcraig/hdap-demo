@@ -3,7 +3,7 @@
         <v-responsive class="align-center fill-height">
             <v-sheet class="mx-auto text-left" max-width="500">
                 <v-container>
-                    <a target="_blank" href="https://backstage.forgerock.com/docs/ds/7.4/rest-guide/preface.html">
+                    <a target="_blank" href="https://backstage.forgerock.com/docs/ds/7.5/rest-guide/preface.html">
                         <v-btn class="text-h5" variant="text" prepend-icon="mdi-sitemap-outline"> HDAP </v-btn>
                     </a>
                 </v-container>
