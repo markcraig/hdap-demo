@@ -5,11 +5,8 @@
     </template>
 
     <v-app-bar-title>
-      <v-btn text="HDAP demo" link href="/"></v-btn>
+      <v-breadcrumbs icon="mdi-sitemap-outline" :items="breadcrumbs"></v-breadcrumbs>
     </v-app-bar-title>
-
-    <v-breadcrumbs justify-center :items="breadcrumbs"></v-breadcrumbs>
-    <v-spacer />
 
     <template v-slot:append>
       <v-btn text="Search" icon link href="/search">
