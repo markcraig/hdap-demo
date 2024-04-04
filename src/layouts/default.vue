@@ -16,4 +16,8 @@ const theme = useTheme()
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
   theme.global.name.value = event.matches ? 'dark' : 'light'
 })
+
+if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  theme.global.name.value = 'dark'
+}
 </script>
