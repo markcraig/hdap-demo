@@ -53,6 +53,9 @@ export const useHdapStore = defineStore('hdapStore', () => {
     /** A human-readable message for the application user. */
     const message = ref('')
 
+    /** The capablities of the HDAP server as indicated in the root DSE. */
+    const serverCapabilities = ref('')
+
     /**
      * Returns the bearer token for the authenticated user, 
      * expiring the session if the token has expired.
@@ -113,6 +116,13 @@ export const useHdapStore = defineStore('hdapStore', () => {
     }
 
     /**
+     * Sets the server capabilities from the HDAP server.
+     */
+    async function setServerCapabilities() {
+        serverCapabilities.value = await hdap.read('', { _fields: '*,%2B' }, null)
+    }
+
+    /**
      * Enables settings to run this store in test mode.
      */
     function setTestMode() {
@@ -133,10 +143,12 @@ export const useHdapStore = defineStore('hdapStore', () => {
         currentJwt,
         friendlyUserName,
         message,
+        serverCapabilities,
         getCredentials,
         login,
         logout,
         setMessage,
+        setServerCapabilities,
         setTestMode,
         whoAmI
     }

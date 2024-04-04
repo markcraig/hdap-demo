@@ -26,8 +26,13 @@ describe('HDAP store', () => {
     })
 
     it('logout should succeed', async () => {
-        expect(await await hdapStore.login(validCreds.id, validCreds.password)).toBeTruthy()
+        expect(await hdapStore.login(validCreds.id, validCreds.password)).toBeTruthy()
         expect(hdapStore.logout()).toBeFalsy()
         expect(hdapStore.whoAmI()).toBeFalsy()
+    })
+
+    it('namingContexts should include dc=com/dc=example', async () => {
+        await hdapStore.setServerCapabilities()
+        expect(hdapStore.serverCapabilities.namingContexts).toContain('dc=com/dc=example')
     })
 })
