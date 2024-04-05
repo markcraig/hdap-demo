@@ -8,8 +8,8 @@
             <v-window v-model="tab">
                 <v-window-item value="basic">
                     <v-container class="bg-surface">
-                        <v-text-field placeholder="Search" clearable v-model.trim="terms"
-                            @keyup.enter="search()"></v-text-field>
+                        <v-text-field placeholder="Search" clearable v-model.trim="searchStore.basicSearchTerms"
+                            @keyup.enter="basicSearch()"></v-text-field>
                     </v-container>
                 </v-window-item>
                 <v-window-item value="advanced">
@@ -17,8 +17,8 @@
                         <v-row no-gutters>
                             <v-col cols="10">
                                 <v-sheet class="pa-2 ma-2">
-                                    <v-text-field label="Query filter" v-model="queryFilter" clearable
-                                        @keyup.enter="advancedSearch()"></v-text-field>
+                                    <v-text-field label="Query filter" v-model="searchStore.advancedSearchQueryFilter"
+                                        clearable @keyup.enter="advancedSearch()"></v-text-field>
                                 </v-sheet>
                             </v-col>
                             <v-col>
@@ -36,22 +36,26 @@
                         <v-row no-gutters>
                             <v-col>
                                 <v-sheet class="pa-2 ma-2">
-                                    <v-text-field label="Base" v-model="base" clearable></v-text-field>
+                                    <v-text-field label="Base" v-model="searchStore.advancedSearchBase"
+                                        clearable></v-text-field>
                                 </v-sheet>
                             </v-col>
                             <v-col>
                                 <v-sheet class="pa-2 ma-2">
-                                    <v-select label="Scope" :items="scopes" v-model="scope"></v-select>
+                                    <v-select label="Scope" :items="['base', 'one', 'sub', 'subordinates']"
+                                        v-model="searchStore.advancedSearchScope"></v-select>
                                 </v-sheet>
                             </v-col>
                             <v-col>
                                 <v-sheet class="pa-2 ma-2">
-                                    <v-checkbox label="Count only" v-model="countOnly"></v-checkbox>
+                                    <v-checkbox label="Count only"
+                                        v-model="searchStore.advancedSearchCountOnly"></v-checkbox>
                                 </v-sheet>
                             </v-col>
                             <v-col>
                                 <v-sheet class="pa-2 ma-2">
-                                    <v-checkbox label="Get operational fields" v-model="operationalFields"></v-checkbox>
+                                    <v-checkbox label="Get operational fields"
+                                        v-model="searchStore.advancedSearchOperationalFields"></v-checkbox>
                                 </v-sheet>
                             </v-col>
                         </v-row>
@@ -107,15 +111,28 @@
 </template>
 
 <script setup>
-import { computed, defineModel, ref } from 'vue'
+import { computed, defineModel, ref, watch } from 'vue'
 import { useHdap } from '@/helpers/hdap'
 import { useHdapStore } from '@/store/hdap'
+import { useSearchStore } from '@/store/search'
 
 const hdap = useHdap()
 const hdapStore = useHdapStore()
+const searchStore = useSearchStore()
+
 const tab = ref('basic')
-const terms = ref('')
 const results = ref('')
+
+onMounted(async () => {
+    tab.value = searchStore.tab
+    results.value = (tab.value == 'basic') ? searchStore.basicSearchResults : searchStore.advancedSearchResults
+    await hdapStore.setServerCapabilities()
+    const namingContexts = hdapStore.serverCapabilities.namingContexts
+    if (namingContexts && !searchStore.advancedSearchBase) {
+        searchStore.advancedSearchBase = namingContexts.sort()[0]
+    }
+})
+
 const entries = computed(() => {
     if (!results.value) return []
     let formatted = []
@@ -133,44 +150,44 @@ const entries = computed(() => {
 })
 const selected = defineModel()
 
-const namingContexts = computed(() => { return hdapStore.serverCapabilities.namingContexts.sort() })
-const base = ref(namingContexts.value[0])
-const queryFilter = ref('true')
-const scopes = ref(['base', 'one', 'sub', 'subordinates'])
-const scope = ref('one')
-const countOnly = ref(false)
-const operationalFields = ref(false)
-
-async function search() {
-    if (!terms.value) {
+async function basicSearch() {
+    if (!searchStore.basicSearchTerms) {
         results.value = ''
+        searchStore.basicSearchResults = ''
         return
     }
-    const filter = `cn co '${terms.value}' or uid eq '${terms.value}' or mail co '${terms.value}'`
+    const terms = searchStore.basicSearchTerms
+    const filter = `cn co '${terms}' or uid eq '${terms}' or mail co '${terms}'`
     const params = { _fields: 'cn,mail,manager,uid,uniqueMember', scope: 'sub' }
     const json = await hdap.query('', filter, params, hdapStore.getCredentials())
-    results.value = (json.result) ? json.result : []
+    results.value = (json.result) ? json.result : ''
+    searchStore.basicSearchResults = results.value
 }
 
 async function advancedSearch() {
-    if (!queryFilter.value) {
+    if (!searchStore.advancedSearchQueryFilter) {
         results.value = ''
+        searchStore.advancedSearchResults = ''
         return
     }
+    const base = searchStore.advancedSearchBase
+    const filter = searchStore.advancedSearchQueryFilter
     const params = {
-        _countOnly: countOnly.value,
-        _fields: (operationalFields.value) ? '*,%2B' : '*',
-        scope: scope.value
+        _countOnly: searchStore.advancedSearchCountOnly,
+        _fields: (searchStore.advancedSearchOperationalFields) ? '*,%2B' : '*',
+        scope: searchStore.advancedSearchScope
     }
-    const json = await hdap.query(base.value, queryFilter.value, params, hdapStore.getCredentials())
-    results.value = (json.result) ? json.result : []
+    const json = await hdap.query(base, filter, params, hdapStore.getCredentials())
+    results.value = (json.result) ? json.result : ''
+    searchStore.advancedSearchResults = results.value
 }
 
 async function deleteItem(item) {
     await hdap
         .remove(item.link, null, null, hdapStore.getCredentials())
         .catch(error => { hdapStore.setMessage(error.message) })
-    search()
+    if (tab.value == 'basic') basicSearch()
+    else advancedSearch()
 }
 
 async function bulkDelete() {
@@ -180,7 +197,8 @@ async function bulkDelete() {
             .catch(error => { hdapStore.setMessage(error.message) })
         selected.value.remove(id)
     })
-    search()
+    if (tab.value == 'basic') basicSearch()
+    else advancedSearch()
 }
 
 function editItem(item) {
@@ -190,4 +208,9 @@ function editItem(item) {
 function bulkEdit() {
     alert('Not implemented yet')
 }
+
+watch(tab, async (newTab) => {
+    searchStore.tab = newTab
+    results.value = (newTab == 'basic') ? searchStore.basicSearchResults : searchStore.advancedSearchResults
+})
 </script>

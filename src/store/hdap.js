@@ -3,7 +3,6 @@ import { getCurrentInstance, onMounted, ref } from 'vue'
 import { jwtDecode } from 'jwt-decode'
 import { useHdap } from '@/helpers/hdap'
 
-// FixMe: this store needs automated testing
 export const useHdapStore = defineStore('hdapStore', () => {
     /*******************************
      * Internal fields and functions
