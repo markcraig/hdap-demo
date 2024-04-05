@@ -23,25 +23,25 @@
 
 <script setup>
 import DefaultLogin from './Login.vue'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useHdapStore } from '@/store/hdap'
-import router from '@/router';
 
 const hdapStore = useHdapStore()
 const namingContexts = computed(() => { return hdapStore.serverCapabilities.namingContexts })
-const home = [{ title: 'Home', disabled: false, href: '/' }]
-const breadcrumbs = ref(home)
+const breadcrumbs = ref([])
+const route = useRoute()
 
 onMounted(() => {
   resetBreadcrumbs(namingContexts.value)
 })
 
-router.afterEach(() => {
+watch(route, () => {
   resetBreadcrumbs(namingContexts.value)
 })
 
 function resetBreadcrumbs(namingContextDns) {
-  breadcrumbs.value = home
+  breadcrumbs.value = [{ title: 'Home', disabled: false, href: '/' }]
   if (!namingContextDns) return
 
   const currentPath = window.location.pathname
