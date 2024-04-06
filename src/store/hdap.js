@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { getCurrentInstance, onMounted, ref } from 'vue'
 import { jwtDecode } from 'jwt-decode'
 import { useHdap } from '@/helpers/hdap'
+import { useMessageStore } from '@/store/message'
 
 export const useHdapStore = defineStore('hdapStore', () => {
     /*******************************
@@ -10,13 +11,14 @@ export const useHdapStore = defineStore('hdapStore', () => {
 
     let hdap = useHdap()
     let skipForTests = false
+    const messageStore = useMessageStore()
 
     if (getCurrentInstance()) {
         onMounted(() => {
             if (currentJwt.value && isJwtExpired()) {
                 expireSession()
             }
-            message.value = ''
+            messageStore.message = ''
         })
     }
 
@@ -24,7 +26,7 @@ export const useHdapStore = defineStore('hdapStore', () => {
         authenticatedUser.value = ''
         currentJwt.value = ''
         friendlyUserName.value = ''
-        message.value = (showMessage) ? 'Session expired' : ''
+        messageStore.message = (showMessage) ? 'Session expired' : ''
     }
 
     function isJwtExpired() {
@@ -32,7 +34,7 @@ export const useHdapStore = defineStore('hdapStore', () => {
     }
 
     async function notifyError(message) {
-        message.value = message
+        messageStore.message = message
         throw new Error(message)
     }
 
@@ -48,9 +50,6 @@ export const useHdapStore = defineStore('hdapStore', () => {
 
     /** The most human-readable name for the authenticated user. */
     const friendlyUserName = ref('')
-
-    /** A human-readable message for the application user. */
-    const message = ref('')
 
     /** The capablities of the HDAP server as indicated in the root DSE. */
     const serverCapabilities = ref('')
@@ -94,7 +93,7 @@ export const useHdapStore = defineStore('hdapStore', () => {
         if (!user) notifyError('Could not read authenticated user resource')
         authenticatedUser.value = user
         friendlyUserName.value = (user.cn) ? user.cn[0] : (user.mail) ? user.mail[0] : id
-        message.value = ''
+        messageStore.message = ''
         return user
     }
 
@@ -104,14 +103,6 @@ export const useHdapStore = defineStore('hdapStore', () => {
     function logout() {
         expireSession()
         if (!skipForTests) this.router.push('/')
-    }
-
-    /**
-     * Sets the message field.
-     * @param {*} messageStr The new message string
-     */
-    function setMessage(messageStr) {
-        message.value = messageStr
     }
 
     /**
@@ -141,12 +132,10 @@ export const useHdapStore = defineStore('hdapStore', () => {
         authenticatedUser,
         currentJwt,
         friendlyUserName,
-        message,
         serverCapabilities,
         getCredentials,
         login,
         logout,
-        setMessage,
         setServerCapabilities,
         setTestMode,
         whoAmI

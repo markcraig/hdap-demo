@@ -1,7 +1,11 @@
-export const useHdap = (apiBase = '/hdap') => {
+import { useMessageStore } from '@/store/message'
+
+export const useHdap = (apiBase = '/hdap', useTestMode = false) => {
     /*******************************
      * Internal fields and functions
      *******************************/
+
+    const messageStore = (useTestMode) ? { message: '' } : useMessageStore()
 
     async function action(name, id, optionalParams, body = {}, credentials = null) {
         if (!name) throw new Error('You must set the action name')
@@ -52,8 +56,69 @@ export const useHdap = (apiBase = '/hdap') => {
     }
 
     async function returnJson(response) {
-        if (!response.ok) throw new Error(`HTTP error with status: ${response.status}`)
+        if (!response.ok) {
+            handleHttpError(response)
+            return {}
+        }
         return response.json()
+    }
+
+    async function handleHttpError(response) {
+        let formalStatus
+        switch (response.status) {
+            case 304:
+                formalStatus = 'HTTP 304 Not Modified'
+                break
+            case 400:
+                formalStatus = 'HTTP 400 Bad Request'
+                break
+            case 401:
+                formalStatus = 'HTTP 401 Unauthorized'
+                break
+            case 403:
+                formalStatus = 'HTTP 403 Forbidden'
+                break
+            case 404:
+                formalStatus = 'HTTP 404 Not Found'
+                break
+            case 405:
+                formalStatus = 'HTTP 405 Method Not Allowed'
+                break
+            case 406:
+                formalStatus = 'HTTP 406 Not Acceptable'
+                break
+            case 409:
+                formalStatus = 'HTTP 409 Conflict'
+                break
+            case 410:
+                formalStatus = 'HTTP 410 Gone'
+                break
+            case 412:
+                formalStatus = 'HTTP 412 Precondition Failed'
+                break
+            case 413:
+                formalStatus = 'HTTP 413 Content Too Large'
+                break
+            case 415:
+                formalStatus = 'HTTP 415 Unsupported Media Type'
+                break
+            case 428:
+                formalStatus = 'HTTP 428 Precondition Required'
+                break
+            case 500:
+                formalStatus = 'HTTP 500 Internal Server Error'
+                break
+            case 501:
+                formalStatus = 'HTTP 501 Not Implemented'
+                break
+            case 503:
+                formalStatus = 'HTTP 503 Service Unavailable'
+                break
+            default:
+                formalStatus = `HTTP ${response.status} error`
+        }
+        const json = await response.json()
+        messageStore.message = `${formalStatus}: ${json.message}`
     }
 
     /*******************************

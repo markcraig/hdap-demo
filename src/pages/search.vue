@@ -114,10 +114,12 @@
 import { computed, defineModel, ref, watch } from 'vue'
 import { useHdap } from '@/helpers/hdap'
 import { useHdapStore } from '@/store/hdap'
+import { useMessageStore } from '@/store/message'
 import { useSearchStore } from '@/store/search'
 
 const hdap = useHdap()
 const hdapStore = useHdapStore()
+const messageStore = useMessageStore()
 const searchStore = useSearchStore()
 
 const tab = ref('basic')
@@ -185,7 +187,7 @@ async function advancedSearch() {
 async function deleteItem(item) {
     await hdap
         .remove(item.link, null, null, hdapStore.getCredentials())
-        .catch(error => { hdapStore.setMessage(error.message) })
+        .catch(error => { messageStore.message = error.message })
     if (tab.value == 'basic') basicSearch()
     else advancedSearch()
 }
@@ -194,7 +196,7 @@ async function bulkDelete() {
     await selected.value.forEach(async (id) => {
         await hdap
             .remove(id, null, null, hdapStore.getCredentials())
-            .catch(error => { hdapStore.setMessage(error.message) })
+            .catch(error => { messageStore.message = error.message })
         selected.value.remove(id)
     })
     if (tab.value == 'basic') basicSearch()
