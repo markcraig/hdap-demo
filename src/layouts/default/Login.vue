@@ -68,9 +68,11 @@
 import { ref } from 'vue'
 import { useHdap } from '@/helpers/hdap'
 import { useHdapStore } from '@/store/hdap'
+import { useSearchStore } from '@/store/search'
 
 const hdap = useHdap()
 const hdapStore = useHdapStore()
+const searchStore = useSearchStore()
 
 // UI settings
 let display = ref(false)
@@ -121,6 +123,7 @@ async function loginWithId() {
 }
 
 function logout() {
+    searchStore.$reset()
     hdapStore.logout()
 }
 </script>
