@@ -68,10 +68,12 @@
 import { ref } from 'vue'
 import { useHdap } from '@/helpers/hdap'
 import { useHdapStore } from '@/store/hdap'
+import { useMessageStore } from '@/store/message'
 import { useSearchStore } from '@/store/search'
 
 const hdap = useHdap()
 const hdapStore = useHdapStore()
+const messageStore = useMessageStore()
 const searchStore = useSearchStore()
 
 // UI settings
@@ -104,7 +106,7 @@ async function loginWithEmail() {
                 loginWithId()
             })
     } catch (error) {
-        hdapStore.setMessage(error.message)
+        messageStore.message = error.message
     }
 }
 
@@ -113,12 +115,12 @@ async function loginWithId() {
         hdapStore.login(id.value, password.value)
             .then(user => {
                 if (!user) {
-                    hdapStore.setMessage('Failed to log in')
+                    messageStore.message = 'Failed to log in'
                     return
                 }
             })
     } catch (error) {
-        hdapStore.setMessage(error.message)
+        messageStore.message = error.message
     }
 }
 

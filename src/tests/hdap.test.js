@@ -1,8 +1,7 @@
 import { expect, test } from 'vitest'
 import { useHdap } from '@/helpers/hdap'
 
-const hdap = useHdap('http://localhost:3000/hdap') // Run HDAP and `npm run dev` locally
-
+const hdap = useHdap('http://localhost:3000/hdap', true) // Run HDAP and `npm run dev` locally
 const adminCreds = { id: 'uid=admin', password: 'password' }
 
 test('authentication should succeed with valid credentials', async () => {
