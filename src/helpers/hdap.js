@@ -65,6 +65,7 @@ export const useHdap = (apiBase = '/hdap', useTestMode = false) => {
 
     async function handleHttpError(response) {
         let formalStatus
+        let additionalInformation =''
         switch (response.status) {
             case 304:
                 formalStatus = 'HTTP 304 Not Modified'
@@ -98,6 +99,7 @@ export const useHdap = (apiBase = '/hdap', useTestMode = false) => {
                 break
             case 413:
                 formalStatus = 'HTTP 413 Content Too Large'
+                additionalInformation = 'Refine the search criteria to limit the number of results.'
                 break
             case 415:
                 formalStatus = 'HTTP 415 Unsupported Media Type'
@@ -118,7 +120,7 @@ export const useHdap = (apiBase = '/hdap', useTestMode = false) => {
                 formalStatus = `HTTP ${response.status} error`
         }
         const json = await response.json()
-        messageStore.message = `${formalStatus}: ${json.message}`
+        messageStore.message = `${formalStatus}: ${json.message}. ${additionalInformation}`
     }
 
     /*******************************
