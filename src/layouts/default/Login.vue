@@ -5,8 +5,8 @@
                 <v-card-title>Hi {{ hdapStore.friendlyUserName }}!</v-card-title>
                 <v-card-subtitle>Welcome to the HDAP demo</v-card-subtitle>
                 <v-list>
-                    <v-list-item prepend-icon="mdi-account-outline" link @click="display = false"
-                        :href="`/view/${hdapStore.authenticatedUser._id}`" class="text-decoration-none">
+                    <v-list-item prepend-icon="mdi-account-outline" link @click="display = false" href="/me"
+                        class="text-decoration-none">
                         My profile
                     </v-list-item>
                     <v-list-item prepend-icon="mdi-cog-outline" link href="/settings" @click="display = false">
@@ -117,6 +117,8 @@ async function loginWithId() {
                 if (!user) {
                     messageStore.message = 'Failed to log in'
                     return
+                } else {
+                    location.reload()
                 }
             })
     } catch (error) {
@@ -127,5 +129,6 @@ async function loginWithId() {
 function logout() {
     searchStore.$reset()
     hdapStore.logout()
+    location.reload()
 }
 </script>
