@@ -68,13 +68,12 @@
             <v-btn v-if="selected && selected.length" prepend-icon="mdi-delete" @click="bulkDelete()">
                 Bulk delete
             </v-btn>
-            <v-data-table v-if="results" :items="entries" item-value="link" show-select v-model="selected"
-                select-strategy="page">
+            <v-data-table v-if="results" :headers="headers" :items="entries" item-value="link" show-select v-model="selected">
                 <template #item.action="{ item }" sortable="false">
                     <v-icon size="small" @click="editItem(item)">mdi-pencil</v-icon>
                     <v-icon size="small" @click="deleteItem(item)">mdi-delete</v-icon>
                 </template>
-                <template #item.link="{ item }">
+                <!-- <template #item.link="{ item }">
                     <router-link :to="{ path: `/view/${item.link}` }">
                         {{ decodeURIComponent(item.link.split('/').pop()) }}
                     </router-link>
@@ -104,7 +103,7 @@
                             {{ decodeURIComponent(member.split('/').pop()) }}
                         </router-link><span v-if="index != (item.members.length - 1)">,</span>
                     </p>
-                </template>
+                </template> -->
             </v-data-table>
         </v-responsive>
     </v-container>
@@ -116,11 +115,13 @@ import { useHdap } from '@/helpers/hdap'
 import { useHdapStore } from '@/store/hdap'
 import { useMessageStore } from '@/store/message'
 import { useSearchStore } from '@/store/search'
+import { useView } from '@/helpers/view'
 
 const hdap = useHdap()
 const hdapStore = useHdapStore()
 const messageStore = useMessageStore()
 const searchStore = useSearchStore()
+const view = useView()
 
 const tab = ref('basic')
 const results = ref('')
@@ -135,18 +136,23 @@ onMounted(async () => {
     }
 })
 
+const optionalColumns = ref(['cn', 'mail', 'manager', 'uniqueMember'])
+const headers = computed(() => {
+    let list = [{ title: 'Action', key: 'action' }, { title: 'ID', key: '_id' }]
+    optionalColumns.value.forEach(column => {
+        list.push({ title: view.entitle(column), key: column })
+    })
+    return list
+})
 const entries = computed(() => {
     if (!results.value) return []
     let formatted = []
     results.value.forEach(result => {
-        formatted.push({
-            action: '',
-            link: result._id,
-            name: result.cn,
-            mail: result.mail,
-            manager: result.manager,
-            members: result.uniqueMember
+        let item = { action: '', _id: result._id }
+        optionalColumns.value.forEach(column => {
+            item[column] = (result[column]) ? result[column] : ''
         })
+        formatted.push(item)
     })
     return formatted
 })

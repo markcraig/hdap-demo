@@ -172,6 +172,16 @@ export const useHdap = (apiBase = '/hdap', useTestMode = false) => {
     }
 
     /**
+     * Returns the JSON schema for the attribute type.
+     * @param {} attribute Attribute type string, such as cn, mail, or manager
+     * @returns the JSON schema for the attribute type.
+     */
+    async function getAttributeSchema(attribute) {
+        if (!attribute) return null
+        return await doRequest('GET', `schemas/attributeTypes/${attribute}`, getCommonHeaders(), null, {})
+    }
+
+    /**
      * Returns the JSON schema for either the specified resource 
      * or a new child resource with the specified object classes.
      * 
@@ -184,10 +194,10 @@ export const useHdap = (apiBase = '/hdap', useTestMode = false) => {
      * @returns The JSON schema.
      */
     async function getSchema(id, objectClasses, optionalParams, credentials = null) {
-        if (!id) throw new Error('You must set the resource identifier')
+        const resourcePath = id || new String()
         const params = optionalParams || {}
         if (objectClasses) params['objectClasses'] = objectClasses.join(',')
-        return await action('schema', id, params, {}, credentials)
+        return await action('schema', resourcePath, params, {}, credentials)
     }
 
     /**
@@ -348,6 +358,7 @@ export const useHdap = (apiBase = '/hdap', useTestMode = false) => {
         authenticate,
         create,
         getAccountUsability,
+        getAttributeSchema,
         getSchema,
         modifyPassword,
         patch,

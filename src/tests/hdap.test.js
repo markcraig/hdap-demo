@@ -128,3 +128,10 @@ test('listing cn=config as a regular user should fail', async () => {
         expect(error.message).toContain('403')
     }
 })
+
+test('getting the schema for the manager attribute should succeed', async () => {
+    const manager = JSON.parse(
+        '{"_id":"manager","type":"array","uniqueItems":true,"items":{"type":"string","format":"json-pointer"}}')
+    const schema = await hdap.getAttributeSchema('manager')
+    expect(schema).toEqual(manager)
+})
