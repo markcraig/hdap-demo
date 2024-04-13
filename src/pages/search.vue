@@ -68,42 +68,34 @@
             <v-btn v-if="selected && selected.length" prepend-icon="mdi-delete" @click="bulkDelete()">
                 Bulk delete
             </v-btn>
-            <v-data-table v-if="results" :headers="headers" :items="entries" item-value="link" show-select v-model="selected">
+            <v-data-table v-if="entries" :headers="headers" :items="entries" show-select v-model="selected"
+                item-value="item._id">
+                <!-- FixMe: How can these be generic? -->
                 <template #item.action="{ item }" sortable="false">
                     <v-icon size="small" @click="editItem(item)">mdi-pencil</v-icon>
                     <v-icon size="small" @click="deleteItem(item)">mdi-delete</v-icon>
                 </template>
-                <!-- <template #item.link="{ item }">
-                    <router-link :to="{ path: `/view/${item.link}` }">
-                        {{ decodeURIComponent(item.link.split('/').pop()) }}
-                    </router-link>
+                <template #item._id="{ item }">
+                    <a :href="item._id.href">{{ item._id.text }}</a>
                 </template>
-                <template #item.name="{ item }">
-                    <p v-for="(one, index) in item.name">
-                        {{ one }}<span v-if="index != (item.name.length - 1)">,</span>
-                    </p>
+                <template #item.cn="{ item }">
+                    {{ item.cn }}
                 </template>
                 <template #item.mail="{ item }">
-                    <p v-for="(one, index) in item.mail">
-                        <a target="_blank" :href="`mailto:${one}`">
-                            {{ one }}
-                        </a><span v-if="index != (item.mail.length - 1)">,</span>
-                    </p>
+                    {{ item.mail }}
                 </template>
                 <template #item.manager="{ item }">
-                    <p v-for="(one, index) in item.manager">
-                        <router-link :to="{ path: `/view/${one}` }">
-                            {{ decodeURIComponent(one.split('/').pop()) }}
-                        </router-link><span v-if="index != (item.manager.length - 1)">,</span>
-                    </p>
+                    <span v-for="(link, index) in item.manager">
+                        <a :href="link.href">{{ link.text }}</a><span
+                            v-if="index != (item.manager.length - 1)"><br></span>
+                    </span>
                 </template>
-                <template #item.members="{ item }">
-                    <p v-for="(member, index) in item.members">
-                        <router-link :to="{ path: `/view/${member}` }">
-                            {{ decodeURIComponent(member.split('/').pop()) }}
-                        </router-link><span v-if="index != (item.members.length - 1)">,</span>
-                    </p>
-                </template> -->
+                <template #item.uniqueMember="{ item }">
+                    <span v-for="(link, index) in item.uniqueMember">
+                        <a :href="link.href">{{ link.text }}</a><span
+                            v-if="index != (item.uniqueMember.length - 1)"><br></span>
+                    </span>
+                </template>
             </v-data-table>
         </v-responsive>
     </v-container>
@@ -137,6 +129,12 @@ onMounted(async () => {
 })
 
 const optionalColumns = ref(['cn', 'mail', 'manager', 'uniqueMember'])
+const schemas = ref({
+    'cn': JSON.parse('{"_id":"cn","supertype":"name","type":"array","uniqueItems":true,"items":{"type":"string"}}'),
+    'mail': JSON.parse('{"_id":"mail","description":"The email address, including internationalized addresses (changed from the standard which only allowed ascii)","type":"array","uniqueItems":true,"items":{"type":"string"}}'),
+    'manager': JSON.parse('{"_id":"manager","type":"array","uniqueItems":true,"items":{"type":"string","format":"json-pointer"}}'),
+    'uniqueMember': JSON.parse('{"_id":"uniqueMember","type":"array","uniqueItems":true,"items":{"type":"path"}}')
+})
 const headers = computed(() => {
     let list = [{ title: 'Action', key: 'action' }, { title: 'ID', key: '_id' }]
     optionalColumns.value.forEach(column => {
@@ -148,12 +146,13 @@ const entries = computed(() => {
     if (!results.value) return []
     let formatted = []
     results.value.forEach(result => {
-        let item = { action: '', _id: result._id }
+        let item = { action: '', _id: view.format('', '_id', result._id) }
         optionalColumns.value.forEach(column => {
-            item[column] = (result[column]) ? result[column] : ''
+            item[column] = (result[column]) ? view.format(schemas.value[column], column, result[column]) : null
         })
         formatted.push(item)
     })
+    console.log(JSON.stringify(formatted))
     return formatted
 })
 const selected = defineModel()
@@ -220,5 +219,11 @@ function bulkEdit() {
 watch(tab, async (newTab) => {
     searchStore.tab = newTab
     results.value = (newTab == 'basic') ? searchStore.basicSearchResults : searchStore.advancedSearchResults
+})
+
+watch(optionalColumns, async () => {
+    for (const column of optionalColumns.value) {
+        schemas.value[column] = await hdap.getAttributeSchema(column)
+    }
 })
 </script>
