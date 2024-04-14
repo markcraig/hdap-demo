@@ -59,12 +59,12 @@ function resetBreadcrumbs(namingContextDns) {
   let finished = false
   namingContextDns.forEach(dn => {
     if (hdapId.startsWith(dn)) {
-      let href = `/${base}/${dn}`
+      let href = `/${base}/${decodeURIComponent(dn)}`
       breadcrumbs.value.push({ title: dn, disabled: false, href: href })
       hdapId.replace(dn, '').split('/').forEach(element => {
         if (element) {
           href += `/${element}`
-          breadcrumbs.value.push({ title: element, disabled: false, href: href })
+          breadcrumbs.value.push({ title: decodeURIComponent(element), disabled: false, href: href })
         }
       })
       finished = true
@@ -75,7 +75,7 @@ function resetBreadcrumbs(namingContextDns) {
     let href = `/${base}`
     hdapId.split('/').forEach(element => {
       href += `/${element}`
-      breadcrumbs.value.push({ title: element, disabled: false, href: href })
+      breadcrumbs.value.push({ title: decodeURIComponent(element), disabled: false, href: href })
     })
   }
 }

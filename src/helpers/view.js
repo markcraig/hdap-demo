@@ -1,3 +1,5 @@
+import { h } from 'vue'
+
 export const useView = () => {
     /**
      * Returns a sentence-case, title-friendly name for an attribute name. 
@@ -22,8 +24,12 @@ export const useView = () => {
         }
     }
 
+    function getLastRdnDecoded(dn) {
+        return decodeURIComponent(dn.split('/').pop())
+    }
+
     function formatBestEffort(value, attribute = null) {
-        if (attribute == '_id') return { href: `/view/${value}`, text: decodeURIComponent(value) }
+        if (attribute == '_id') return { href: `/view/${value}`, text: getLastRdnDecoded(value) }
         return (Object.prototype.toString.call(value) === '[object Array]') ? value.join(', ') : value
     }
 
@@ -36,10 +42,10 @@ export const useView = () => {
             case 'null':
                 return ''
             case 'path':
-                return { href: `/view/${value}`, text: decodeURIComponent(value) }
+                return { href: `/view/${value}`, text: getLastRdnDecoded(value) }
             case 'string':
                 return (format == 'json-pointer')
-                    ? { href: `/view/${value}`, text: decodeURIComponent(value) }
+                    ? { href: `/view/${value}`, text: getLastRdnDecoded(value) }
                     : value
             case 'boolean':
             case 'number':
