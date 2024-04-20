@@ -1,7 +1,16 @@
 <template>
     <v-container>
         <v-responsive class="align-center fill-height">
-            <v-data-table :items="attributes" :items-per-page="-1">
+            <v-data-table :headers="headers" :items="attributes" :items-per-page="-1">
+                <template v-slot:item="{ item }">
+                    <tr>
+                        <td>{{ item.title }}</td>
+                        <td>
+                            <Viewer :schema="item.content.schema" :attribute="item.content.attribute"
+                                :value="item.content.value" />
+                        </td>
+                    </tr>
+                </template>
                 <template #bottom></template>
             </v-data-table>
         </v-responsive>
@@ -21,13 +30,8 @@ const messageStore = useMessageStore()
 const view = useView()
 
 const entry = ref('')
+const headers = [{ title: 'Field', key: 'title' }, { title: 'Value', key: 'content' }]
 const attributes = ref([])
-
-function format(attribute, value) {
-    if (!entry.schema) return
-    const schema = entry.schema.properties[attribute]
-    return view.format(schema, attribute, value)
-}
 
 async function read() {
     const path = window.location.pathname.replace('/view/', '')
@@ -38,7 +42,14 @@ async function read() {
     }
     entry.value = await hdap.read(path, null, hdapStore.getCredentials())
     for (const [attribute, value] of Object.entries(entry.value)) {
-        attributes.value.push({ attribute: view.entitle(attribute), value: format(attribute, value) })
+        attributes.value.push({
+            title: view.entitle(attribute),
+            content: {
+                schema: entry.schema.properties[attribute],
+                attribute: attribute,
+                value: value
+            }
+        })
     }
 }
 
