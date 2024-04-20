@@ -2,23 +2,6 @@
     <v-container>
         <v-responsive class="align-center fill-height">
             <v-data-table :items="attributes" :items-per-page="-1">
-                <template v-slot:item="{ item }">
-                    <tr>
-                        <td>{{ view.entitle(item.attribute) }}</td>
-                        <td>
-                            <div v-if="Array.isArray(item.value)">
-                                <span v-for="(link, index) in item.value">
-                                    <a :href="link.href">{{ link.text }}</a><span
-                                        v-if="index != (item.value.length - 1)"><br></span>
-                                </span>
-                            </div>
-                            <div v-else>
-                                <a v-if="item.value.href" :href="item.value.href">{{ item.value.text }}</a>
-                                <span v-else>{{ item.value }}</span>
-                            </div>
-                        </td>
-                    </tr>
-                </template>
                 <template #bottom></template>
             </v-data-table>
         </v-responsive>
@@ -55,7 +38,7 @@ async function read() {
     }
     entry.value = await hdap.read(path, null, hdapStore.getCredentials())
     for (const [attribute, value] of Object.entries(entry.value)) {
-        attributes.value.push({ attribute: attribute, value: format(attribute, value) })
+        attributes.value.push({ attribute: view.entitle(attribute), value: format(attribute, value) })
     }
 }
 

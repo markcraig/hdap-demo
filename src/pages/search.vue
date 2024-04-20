@@ -75,7 +75,7 @@
                     <v-icon size="small" @click="editItem(item)">mdi-pencil</v-icon>
                     <v-icon size="small" @click="deleteItem(item)">mdi-delete</v-icon>
                 </template>
-                <template #item._id="{ item }">
+                <!-- <template #item._id="{ item }">
                     <a :href="item._id.href">{{ item._id.text }}</a>
                 </template>
                 <template #item.cn="{ item }">
@@ -95,14 +95,14 @@
                         <a :href="link.href">{{ link.text }}</a><span
                             v-if="index != (item.uniqueMember.length - 1)"><br></span>
                     </span>
-                </template>
+                </template> -->
             </v-data-table>
         </v-responsive>
     </v-container>
 </template>
 
 <script setup>
-import { computed, defineModel, ref, watch } from 'vue'
+import { computed, defineModel, h, ref, watch } from 'vue'
 import { useHdap } from '@/helpers/hdap'
 import { useHdapStore } from '@/store/hdap'
 import { useMessageStore } from '@/store/message'
@@ -146,7 +146,10 @@ const entries = computed(() => {
     if (!results.value) return []
     let formatted = []
     results.value.forEach(result => {
-        let item = { action: '', _id: view.format('', '_id', result._id) }
+        let item = {
+            action: '',
+            _id: view.format('', '_id', result._id)
+        }
         optionalColumns.value.forEach(column => {
             item[column] = (result[column]) ? view.format(schemas.value[column], column, result[column]) : null
         })
@@ -165,7 +168,7 @@ async function basicSearch() {
     }
     const terms = searchStore.basicSearchTerms
     const filter = `cn co '${terms}' or uid eq '${terms}' or mail co '${terms}'`
-    const params = { _fields: 'cn,mail,manager,uid,uniqueMember', scope: 'sub' }
+    const params = { scope: 'sub' }
     const json = await hdap.query('', filter, params, hdapStore.getCredentials())
     results.value = (json.result) ? json.result : ''
     searchStore.basicSearchResults = results.value

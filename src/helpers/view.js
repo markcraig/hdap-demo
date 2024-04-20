@@ -29,49 +29,60 @@ export const useView = () => {
     }
 
     function formatBestEffort(value, attribute = null) {
-        if (attribute == '_id') return { href: `/view/${value}`, text: getLastRdnDecoded(value) }
-        return (Object.prototype.toString.call(value) === '[object Array]') ? value.join(', ') : value
+        if (attribute == '_id') return h('a', { href: `/view/${value}` }, getLastRdnDecoded(value))
+        return (Object.prototype.toString.call(value) === '[object Array]')
+            ? h('span', value.join(', '))
+            : h('span', value)
     }
 
     function formatValue(type, format, value) {
         switch (type) {
             case 'array':
-                return value.join(', ')
+                return h('span', value.join(', '))
             case 'object':
-                return JSON.stringify(value)
+                return h('code', JSON.stringify(value))
             case 'null':
                 return ''
             case 'path':
-                return { href: `/view/${value}`, text: getLastRdnDecoded(value) }
+                return h('a', { href: `/view/${value}` }, getLastRdnDecoded(value))
             case 'string':
                 return (format == 'json-pointer')
-                    ? { href: `/view/${value}`, text: getLastRdnDecoded(value) }
-                    : value
+                    ? h('a', { href: `/view/${value}` }, getLastRdnDecoded(value))
+                    : h('span', value)
             case 'boolean':
             case 'number':
             case 'integer':
-                return value
+                return h('span', value)
             default:
                 return formatBestEffort(value)
         }
     }
 
     /**
-     * Returns either an array of objects or single object like { href: optional-href, text: text-value }.
+     * Returns a virtual node, possibly with children.
      * @param {*} schema    The JSON schema for the attribute
      * @param {*} attr      The attribute name, such as 'cn'
      * @param {*} value     The attribute value, such as [ 'Barbara Jensen', 'Babs Jensen' ]
-     * @returns Either an array of objects or single object like { href: optional-href, text: text-value }.
+     * @returns A virtual node, possibly with children.
      */
     function format(schema, attr, value) {
         if (!schema) return formatBestEffort(value, attr)
         switch (schema.type) {
             case 'array':
-                if (schema.items.type == 'path' || schema.items.format == 'json-pointer') {
-                    return value.map(val => formatValue(schema.items.type, schema.items.format, val))
+                const separator = (schema.items.type == 'array'
+                    || schema.items.type == 'path'
+                    || schema.items.format == 'json-pointer') ? 'newline' : 'comma'
+                const items = value.map(val => formatValue(schema.items.type, schema.items.format, val))
+                const children = []
+                const separators = Array.from({ length: items.length }).map(() => {
+                    return (separator == 'newline') ? h('br') : h('span', ', ')
+                })
+                for (let i = 0; i < items.length; ++i) {
+                    children.push(items[i])
+                    children.push(separators[i])
                 }
-                const separator = (schema.items.type == 'array') ? '\n' : ', '
-                return value.map(val => formatValue(schema.items.type, schema.items.format, val)).join(separator)
+                children.pop()  // Last separator
+                return h('div', children)
             case 'boolean':
             case 'integer':
             case 'null':
